@@ -5,11 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.example.secondhomework.R
 import com.example.secondhomework.adapters.UserAdapter
 import com.example.secondhomework.models.User
+import org.json.JSONArray
+import org.json.JSONObject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,6 +32,11 @@ class FirstFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    val userList :ArrayList<User> = ArrayList<User>()
+
+
+    val userAdapter :UserAdapter = UserAdapter(userList)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -39,6 +50,7 @@ class FirstFragment : Fragment() {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_first, container, false)
         setupRecyclerView(view)
+        getPosts()
         return view
     }
 
@@ -67,21 +79,55 @@ class FirstFragment : Fragment() {
 
         val linearLayoutManager = LinearLayoutManager(view.context);
 
-        val userList :ArrayList<User> = ArrayList<User>()
-        userList.add(User("1","Cristi","fdsiofjiso","andrichrioe@yahoo.com","lib","Cov","Covasna",
-        "5454345","455","435","0669407","rjeorjgo","fjojfeiog","fjsdofsoi","das"));
-        userList.add(User("2","Cristi","fdsiofjiso","andrichrioe@yahoo.com","lib","Cov","Covasna",
-            "5454345","455","435","0669407","rjeorjgo","fjojfeiog","fjsdofsoi","das"));
-        userList.add(User("3","Cristi","fdsiofjiso","andrichrioe@yahoo.com","lib","Cov","Covasna",
-            "5454345","455","435","0669407","rjeorjgo","fjojfeiog","fjsdofsoi","das"));
-        userList.add(User("4","Cristi","fdsiofjiso","andrichrioe@yahoo.com","lib","Cov","Covasna",
-            "5454345","455","435","0669407","rjeorjgo","fjojfeiog","fjsdofsoi","das"));
-        userList.add(User("5","Cristi","fdsiofjiso","andrichrioe@yahoo.com","lib","Cov","Covasna",
-            "5454345","455","435","0669407","rjeorjgo","fjojfeiog","fjsdofsoi","das"));
+        userList.clear()
 
-        val userAdapter :UserAdapter = UserAdapter(userList)
+        userList.add(User("Tupik","andreichris55@yahoo.com"))
+        userList.add(User("null","null@gmail.com"))
+        userList.add(User("null2","null@gmail.com"))
+        userList.add(User("null3","null@gmail.com"))
+        userList.add(User("null4","null@gmail.com"))
+
+
 
         recyclerView.layoutManager = linearLayoutManager
         recyclerView.adapter = userAdapter
+    }
+
+    fun getPosts(){
+        val queue = Volley.newRequestQueue(activity)
+
+        val url = "https://jsonplaceholder.typicode.com/users";
+
+        val getPostsRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            {response ->
+                handlePostResponse(response)
+            },
+            {error->
+                Toast.makeText(
+                        activity,
+                        "ERROR get posts failed with error: ${error.message}",
+                        Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+        queue.add(getPostsRequest)
+    }
+
+    fun handlePostResponse(result:String){
+        val postJsonArray = JSONArray(result)
+        for (index in 0 until postJsonArray.length()){
+            val postJson : JSONObject? = postJsonArray[index] as? JSONObject
+            postJson?.let {
+                val id = postJson.getLong("id")
+                val username = postJson.getString("username")
+                val email = postJson.getString("email")
+
+                val postUser:User = User(username,email)
+                userList.add(postUser)
+            }
+        }
+        userAdapter.notifyDataSetChanged()
     }
 }
