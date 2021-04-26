@@ -7,6 +7,7 @@ import android.util.LruCache;
 
 import androidx.annotation.Nullable;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -38,11 +39,27 @@ public class VolleyConfigSingleton {
 
     }
 
+    public static synchronized VolleyConfigSingleton getInstance(Context context){
+        if (instance == null)
+        {
+            instance = new VolleyConfigSingleton(context);
+        }
+        return instance;
+    }
+
+    public <T> void addRequest(Request<T> request){
+        getRequestQueue().add(request);
+    }
+
     public RequestQueue getRequestQueue()
     {
         if (requestQueue == null){
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return requestQueue;
+    }
+
+    public ImageLoader getImageLoader() {
+        return imageLoader;
     }
 }

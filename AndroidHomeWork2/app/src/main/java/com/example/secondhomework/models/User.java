@@ -1,12 +1,22 @@
 package com.example.secondhomework.models;
 
 public class User {
+    private String id;
     private String username;
     private String email;
 
-    public User(String username, String email) {
+    public User(String username, String email,String id) {
+        this.id = id;
         this.username = username;
         this.email = email;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUsername() {
