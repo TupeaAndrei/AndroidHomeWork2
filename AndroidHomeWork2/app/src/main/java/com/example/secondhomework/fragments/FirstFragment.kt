@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +30,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [FirstFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment() , View.OnClickListener{
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -53,6 +55,9 @@ class FirstFragment : Fragment() {
         setupRecyclerView(view)
         getPosts()
         return view
+    }
+
+    override fun onClick(v: View?) {
     }
 
     companion object {
@@ -80,7 +85,7 @@ class FirstFragment : Fragment() {
 
         val linearLayoutManager = LinearLayoutManager(view.context);
 
-        userList.clear()
+        //userList.clear()
 
 
 
@@ -112,6 +117,43 @@ class FirstFragment : Fragment() {
         queue.add(getPostsRequest)
     }
 
+    fun getSecondaryPosts(id:String){
+        val volleyConfigSingleton = VolleyConfigSingleton.getInstance(this.context)
+        val queue = volleyConfigSingleton.requestQueue
+        val url = "https://jsonplaceholder.typicode.com/posts?userId=" + id;
+        val getPostsRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            {response->
+                handleSecondaryRequests(id,response)
+            },
+            {
+                error->
+                Toast.makeText(
+                    activity,
+                    "ERROR get posts failed with error: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+        queue.add(getPostsRequest)
+    }
+
+    fun handleSecondaryRequests(id:String,result:String){
+        val postJsonArray = JSONArray(result)
+        for (index in 0 until postJsonArray.length()){
+            val jsonObj: JSONObject? = postJsonArray[index] as? JSONObject
+            jsonObj?.let {
+                val postTitle = jsonObj.getString("title")
+                val postBody = jsonObj.getString("body")
+
+                userList.get(Integer.parseInt(id)).postTitle = postTitle
+                userList.get(Integer.parseInt(id)).postBody = postBody
+            }
+        }
+        userAdapter.notifyDataSetChanged()
+    }
+
     fun handlePostResponse(result:String){
         val postJsonArray = JSONArray(result)
         for (index in 0 until postJsonArray.length()){
@@ -124,6 +166,10 @@ class FirstFragment : Fragment() {
                 val postUser:User = User(username,email,id)
                 userList.add(postUser)
             }
+        }
+        userAdapter.notifyDataSetChanged()
+        for (index in 0 until userList.size){
+            getSecondaryPosts(index.toString())
         }
         userAdapter.notifyDataSetChanged()
     }

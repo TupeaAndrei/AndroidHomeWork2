@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.secondhomework.fragments.FirstFragment
 import com.example.secondhomework.fragments.SecondFragment
+import com.example.secondhomework.fragments.ThirdFragment
 import com.example.secondhomework.interfaces.OnUserItemClick
 import kotlin.concurrent.fixedRateTimer
 
@@ -34,5 +35,12 @@ class MainActivity : AppCompatActivity(), OnUserItemClick{
         fragmentTransaction.replace(R.id.frame_layout,SecondFragment.newInstance(""," ",choosenPos))
         fragmentTransaction.commit()
 
+    }
+
+    override fun moveToThirdFragment(choosenPos: String) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.frame_layout,ThirdFragment.newInstance("","",choosenPos))
+        fragmentTransaction.commit()
     }
 }

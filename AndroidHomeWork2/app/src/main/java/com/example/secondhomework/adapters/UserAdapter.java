@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.secondhomework.R;
 import com.example.secondhomework.VolleyConfigSingleton;
+import com.example.secondhomework.fragments.FirstFragment;
 import com.example.secondhomework.interfaces.OnUserItemClick;
 import com.example.secondhomework.models.User;
 
@@ -47,11 +48,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         ImageView arrow = holder.itemView.findViewById(R.id.arrow_image);
         //on item click
         final boolean isExpanded = position == mExpandedPosition;
-        //holder.itemView
+        holder.setVisibility(isExpanded);
+
+        if (isExpanded){
+            previousExpandedPosition = position;
+        }
         holder.itemView.setActivated(isExpanded);
         arrow.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+
                 mExpandedPosition = isExpanded ? -1:position;
                 notifyItemChanged(previousExpandedPosition);
                 notifyItemChanged(position);
@@ -88,12 +94,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private TextView username;
         private TextView email;
         private ImageView arrow;
+        private TextView postTitle;
+        private TextView postBody;
 
         public UserViewHolder(View view){
             super(view);
             username = view.findViewById(R.id.username_id);
             email = view.findViewById(R.id.email_id);
             arrow = view.findViewById(R.id.arrow_image);
+            postTitle = view.findViewById(R.id.post_title);
+            postBody = view.findViewById(R.id.post_body);
             posId="1";
         }
 
@@ -101,8 +111,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             posId = user.getId();
             username.setText(user.getUsername());
             email.setText(user.getEmail());
-            String imageUrl = "getsomeutl";
-            ImageLoader imageLoader = VolleyConfigSingleton.getInstance(arrow.getContext().getApplicationContext()).getImageLoader();
+            postTitle.setText(user.getPostTitle());
+            postBody.setText(user.getPostBody());
+            String imageUrl = "https://pngtree.com/freepng/down-glyph-black-icon_4008289.png";
+            /*ImageLoader imageLoader = VolleyConfigSingleton.getInstance(arrow.getContext().getApplicationContext()).getImageLoader();
             imageLoader.get(imageUrl, new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
@@ -113,7 +125,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 public void onErrorResponse(VolleyError error) {
 
                 }
-            });
+            });*/
+        }
+
+        public void setVisibility(boolean vis){
+            postTitle.setVisibility(vis?View.VISIBLE:View.GONE);
+
         }
     }
 }
